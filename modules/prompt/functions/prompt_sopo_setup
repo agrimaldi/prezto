@@ -1,0 +1,97 @@
+#
+# A simple theme that displays relevant, contextual information.
+#
+# Authors:
+#   sopo Ionescu <sopo.ionescu@gmail.com>
+#
+# Screenshots:
+#   http://i.imgur.com/nBEEZ.png
+#
+
+# Load dependencies.
+pmodload 'helper'
+
+# Color shortcuts
+RED=$fg[red]
+YELLOW=$fg[yellow]
+GREEN=$fg[green]
+WHITE=$fg[white]
+BLUE=$fg[blue]
+MAGENTA=$fg[magenta]
+RED_BOLD=$fg_bold[red]
+YELLOW_BOLD=$fg_bold[yellow]
+GREEN_BOLD=$fg_bold[green]
+WHITE_BOLD=$fg_bold[white]
+BLUE_BOLD=$fg_bold[blue]
+RESET_COLOR=$reset_color
+
+function prompt_sopo_pwd {
+  #local pwd="${PWD/#$HOME/~}"
+
+  #if [[ "$pwd" == (#m)[/~] ]]; then
+    #_prompt_sopo_pwd="$MATCH"
+    #unset MATCH
+  #else
+    #_prompt_sopo_pwd="${${${(@j:/:M)${(@s:/:)pwd}##.#?}:h}%/}/${pwd:t}"
+  #fi
+  _prompt_sopo_pwd="%~"
+}
+
+function prompt_sopo_precmd {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+
+  # Format PWD.
+  prompt_sopo_pwd
+
+  # Get Git repository information.
+  if (( $+functions[git-info] )); then
+    git-info
+  fi
+}
+
+function prompt_sopo_setup {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  prompt_opts=(cr percent subst)
+
+  # Load required functions.
+  autoload -Uz add-zsh-hook
+
+  # Add hook for calling git-info before each command.
+  add-zsh-hook precmd prompt_sopo_precmd
+
+  zstyle ':prezto:module:editor:info:completing' format '%F{red}...%f'
+  zstyle ':prezto:module:editor:info:keymap:primary' format '%B%F{green}❯❯❯%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format ' %B%F{red}♺%f%b'
+  zstyle ':prezto:module:editor:info:keymap:alternate' format '%B%F{magenta}❮❮❮%f%b'
+  zstyle ':prezto:module:git:info:action' format ':%%B%F{yellow}%s%f%%b'
+  zstyle ':prezto:module:git:info:branch' format '%F{magenta}%b%f'
+  zstyle ':prezto:module:git:info:commit' format '%F{yellow}%.7c%f'
+  zstyle ':prezto:module:git:info:position' format ': %F{green}%p%f'
+  zstyle ':prezto:module:git:info:added' format ' %%B%F{green}A%f%%b '
+  zstyle ':prezto:module:git:info:deleted' format ' %%B%F{red}D%f%%b '
+  zstyle ':prezto:module:git:info:modified' format ' %%B%F{yellow}M%f%%b '
+  zstyle ':prezto:module:git:info:renamed' format ' %%B%F{magenta}R%f%%b '
+  zstyle ':prezto:module:git:info:stashed' format ' %%B%F{cyan}✭%f%%b '
+  zstyle ':prezto:module:git:info:unmerged' format ' %%B%F{yellow}═%f%%b '
+  zstyle ':prezto:module:git:info:untracked' format ' %%B%F{white}u%f%%b '
+  zstyle ':prezto:module:git:info:ahead' format ' %F{white}%A%F{yellow}⬆%f '
+  zstyle ':prezto:module:git:info:behind' format ' %F{white}%B%F{yellow}⬇%f '
+  zstyle ':prezto:module:git:info:keys' format \
+    'prompt' '( %F{green}%f$(coalesce "%b" "%p" "%c") )%s ' \
+    'rprompt' '%S%a%d%m%r%u%U' \
+    'dprompt' '%A%B'
+
+  # Define prompts.
+  PROMPT='
+
+%F{cyan}%m%f:%F{blue}${_prompt_sopo_pwd}%f ${git_info:+${(e)git_info[prompt]}${git_info[rprompt]:+[${git_info[rprompt]}]}${git_info[dprompt]:+[${git_info[dprompt]}]}}
+%(!. %B%F{red}#%f%b.)${editor_info[keymap]} '
+  RPROMPT='${editor_info[overwrite]}%(?:: %F{red}⏎%f)${VIM:+" %B%F{green}V%f%b"}'
+  SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
+  TIMEFMT=$'\nreal\t%E\nuser\t%U\nsys\t%S'
+}
+
+prompt_sopo_setup "$@"
+
