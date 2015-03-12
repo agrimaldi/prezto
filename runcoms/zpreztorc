@@ -30,6 +30,7 @@ zstyle ':prezto:load' pmodule \
   'history' \
   'history-substring-search' \
   'rsync' \
+  'archive' \
   'directory' \
   'spectrum' \
   'utility' \
