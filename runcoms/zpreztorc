@@ -29,6 +29,7 @@ zstyle ':prezto:load' pmodule \
   'editor' \
   'history' \
   'history-substring-search' \
+  'rsync' \
   'directory' \
   'spectrum' \
   'utility' \
