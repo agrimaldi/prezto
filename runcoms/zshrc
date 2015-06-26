@@ -47,3 +47,5 @@ glog() {
     fi
   done
 }
+
+source /Users/agrimaldi/.iterm2_shell_integration.zsh
